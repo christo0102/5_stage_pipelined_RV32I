@@ -2,9 +2,9 @@
 module RV32I_Pipelined (
     input  clk,
     input  reset,
-    output reg [31:0] ALU ,
-    output reg memory_signal,
-    output reg [31:0] writeing_data
+    output [31:0] ALU ,
+    output memory_signal,
+    output [31:0] writeing_data
 );
 
     wire [31:0] pc_outF;
@@ -85,11 +85,13 @@ module RV32I_Pipelined (
     wire [2:0]  funct3W;
     wire [1:0]  ForwardAE;
     wire [1:0]  ForwardBE;
-    wire [1:0]  PCSrc ;
+    wire [1:0] PCSrc ;
 
     assign rdD = instructionD[11:7];
     assign rs2D = instructionD[24:20];
     assign rs1D = instructionD[19:15];
+
+    
 
     wire take_branchE = (
         (funct3E == 3'b000 &&  zeroE)     |
@@ -100,7 +102,7 @@ module RV32I_Pipelined (
         (funct3E == 3'b111 && ~LessThanE)
     );
 
-    assign BranchE = take_branchE & branchE;
+       assign  BranchE = take_branchE & branchE;
 
     reg [1:0] PCSrcE;
     
@@ -362,17 +364,8 @@ module RV32I_Pipelined (
        .pc_targetE(pc_targetE)
     );
     
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            memory_signal <= 1'b0;
-            ALU           <= 32'h0;
-            writeing_data <= 32'h0;
-        end else begin
-            memory_signal <= MemWriteM;
-            ALU           <= ALU_ResultM;
-            writeing_data <= ResultW;
-        end
-    end
+    assign memory_signal = MemWriteM;
+    assign ALU = ALU_ResultM;
+    assign writeing_data = ResultW;
     
 endmodule
-
